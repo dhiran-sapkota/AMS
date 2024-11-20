@@ -8,9 +8,9 @@ class User < ApplicationRecord
 
     has_secure_password
 
-    validates :password, presence: true
     validates :firstname, presence: true
     validates :lastname, presence: true
+    validates :password, presence: true, if: :password_required?
     validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
     validates :phone, presence: true
     validates :dob, presence: true
@@ -18,4 +18,8 @@ class User < ApplicationRecord
     validates :address, presence: true
     validates :role, presence: true
     validates :phone, presence: true, format: { with: /\A[0-9]{10}\z/, message: "must be 10 digits" }
+
+    def password_required?
+        new_record? || password.present?
+    end
 end
