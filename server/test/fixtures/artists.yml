@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  no_of_albums_released: 1
+  first_release_year: 1
+  user: one
+
+two:
+  no_of_albums_released: 1
+  first_release_year: 1
+  user: two

@@ -17,4 +17,7 @@ Rails.application.routes.draw do
   patch "/api/user/update/:id", to:"users#updateUser"
   delete "/api/user/delete/:id", to:"users#deleteUser"
 
+  scope "/api" do
+    resources :artists
+  end
 end

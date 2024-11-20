@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-    include JwtHelper
 
-    before_action :getCurrentUser
+    include AuthenticationConcern
+
     before_action :authorizeSuperAdmin
 
 
@@ -80,22 +80,9 @@ class UsersController < ApplicationController
     end
 
     private
-    def getCurrentUser
-        token = request.headers["Authorization"]&.split(" ")&.last
-        if token
-            @currentUser = decode_token(token)
-            if !@currentUser
-                render json: { message: "invalid token"}, status: :unauthorized
-            end    
-        else
-            render json: { message: "token missing"}, status: :unauthorized
-        end 
-    end 
-
-    private
     def authorizeSuperAdmin
         if @currentUser["role"] != "super_admin"
-            render json: { message: "not allowed" }, status: :forbiddend
+            render json: { message: "not allowed" }, status: :forbidden
         end
     end
 
