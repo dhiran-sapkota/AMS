@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   get "/api/users", to:"users#index"
   post "/api/auth/register", to:"auth#register"
   post "/api/auth/login", to:"auth#login"
+  get "/api/auth/validate-token", to:"auth#tokenvalidate"
 
   # post "/api/user/create", to:"users#create"
   # get "/api/user/all", to:"users#getAllUser"

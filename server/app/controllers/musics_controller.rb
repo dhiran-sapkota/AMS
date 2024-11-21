@@ -40,9 +40,9 @@ class MusicsController < ApplicationController
       newMusic = Music.new(music_params_with_user)
   
       if newMusic.save
-        render json: { message: "Music created successfully", music: newMusic }, status: :created
+        render json: { message: "Music created successfully", music: newMusic, success: true }, status: :created
       else
-        render json: { error: "Validation failed", message: newMusic.errors.full_messages }, status: :unprocessable_entity
+        render json: { error: "Validation failed", message: newMusic.errors.full_messages, success: false }, status: :unprocessable_entity
       end
     end
   

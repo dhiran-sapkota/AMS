@@ -18,10 +18,28 @@ class AuthController < ApplicationController
       user = User.find_by(email: loginParams[:email])  
     
       if user && user.authenticate(loginParams[:password]) 
-        render json: {message: "login successful", token: encodeUser(user) }, status: :ok
+
+        render json: {message: "login successful", accessToken: encodeUser(user), success: true, user:user.as_json(except: [:password_digest]) }, status: :ok
       else
         render json: {message: "Invalid email or password"}, status: :unauthorized
       end
+    end
+
+    def tokenvalidate
+      puts "was here-------------------------------------------"
+      token = request.headers["Authorization"]&.split(" ")&.last
+      puts token
+      puts "---------"
+        if token
+            user = decode_token(token)
+            unless user
+                render json: { message: "invalid token"}, status: :unauthorized
+                return
+            end    
+            render json: {message: "token is valid", user: user}
+        else
+            render json: { message: "token missing"}, status: :unauthorized
+        end
     end
 
     private
