@@ -3,7 +3,6 @@ class MusicsController < ApplicationController
   
     before_action :check_artist_permission, only: [:create, :update, :destroy]
     before_action :set_music, only: [:update, :destroy]
-    before_action :can_update, only: [:update, :destroy]
 
   
     def index
@@ -12,9 +11,28 @@ class MusicsController < ApplicationController
         render json: { message: "Artist ID is required" }, status: :bad_request
         return
       end
-  
+
+      limit = params.fetch(:limit, 5)
+      offset = params.fetch(:offset, 0)
+      
       musics = Music.where(user_id: artistId)
-      render json: musics, status: :ok
+      if params[:query].present?
+        musics = musics.where("title LIKE ?", "%#{params[:query]}%")
+      end
+
+      if params[:sort_by].present?
+        allowed_sort_columns = ['created_at', 'title', 'updated_at'] 
+        sort_column = allowed_sort_columns.include?(params[:sort_by]) ? params[:sort_by] : 'created_at'
+        sort_order = params[:sort_order] == 'desc' ? 'desc' : 'asc' 
+        musics = musics.order("#{sort_column} #{sort_order}")
+      else
+        musics = musics.order(created_at: :desc)
+      end
+
+      totalCount = musics.length
+      musics = musics.limit(limit).offset(offset)
+
+      render json: {message:"Musics retrieved successfully", data: musics, total: totalCount }, status: :ok
     end
   
     def create
@@ -62,9 +80,7 @@ class MusicsController < ApplicationController
   
     def set_music
       @music = Music.find_by(id: params[:id])
-    end
 
-    def can_update
       if @music[:user_id] != @currentUser["user_id"]
         render json: { message: "not allowed to update music"}, status: :forbidden
         nil

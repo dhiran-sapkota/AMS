@@ -12,12 +12,13 @@ Rails.application.routes.draw do
   post "/api/auth/register", to:"auth#register"
   post "/api/auth/login", to:"auth#login"
 
-  post "/api/user/create", to:"users#create"
-  get "/api/user/all", to:"users#getAllUser"
-  patch "/api/user/update/:id", to:"users#updateUser"
-  delete "/api/user/delete/:id", to:"users#deleteUser"
+  # post "/api/user/create", to:"users#create"
+  # get "/api/user/all", to:"users#getAllUser"
+  # patch "/api/user/update/:id", to:"users#updateUser"
+  # delete "/api/user/delete/:id", to:"users#deleteUser"
 
   scope "/api" do
+    resources :users
     resources :artists
     resources :musics
   end

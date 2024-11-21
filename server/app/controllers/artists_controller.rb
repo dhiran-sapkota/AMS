@@ -3,89 +3,43 @@ class ArtistsController < ApplicationController
     include AuthenticationConcern
 
     before_action :allow_artist_manager, only: [:update, :destroy, :create]
-    before_action :allow_artist_manager_or_super_admin, only: [:index, :show]
+    before_action :allow_artist_manager_or_super_admin, only: [:index]
 
 
     def index
+
+        limit = params.fetch(:limit, 5)
+        offset = params.fetch(:offset, 0)
+
         if @currentUser["role"] == "artist_manager"
-            allArtists = Artist.find_by_sql([
-                "SELECT artists.*, #{
-                  (User.column_names - ["password_digest"]).map{
-                  |col| "users.#{col}"
-                }.join(", ")
-                }
-                 FROM artists INNER JOIN users ON artists.user_id = users.id
-                 WHERE users.created_by = ?
-                ",
-                [@currentUser["user_id"]]
-              ])
-            render json: { artists: allArtists }, status: :ok
+            allArtists = Artist.joins(:user)
+            .where("users.role = '2'")
+            .where("users.created_by = ?", @currentUser["user_id"])
+            .select("artists.*, #{(User.column_names - ["password_digest"]).map{ |col| "users.#{col}" }.join(", ")}")
+            
+            if params[:query].present?
+                allArtists = allArtists.where("users.firstname LIKE ? OR users.lastname LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+            end
+
+            totalCount = allArtists.length
+            allArtists = allArtists.limit(limit).offset(offset)
+
+            render json: { message: "All artists retrieved successfully", data: allArtists, total: totalCount }, status: :ok
         else
-            allArtists = Artist.find_by_sql(
-                [
-                    "SELECT artists.*, #{
-                        (User.column_names - ["password_digest"]).map{
-                        |col| "users.#{col}"
-                      }.join(", ")
-                      }
-                     FROM artists
-                     INNER JOIN users ON artists.user_id = users.id
-                     WHERE users.role = '2' AND users.created_by IN (
-                        SELECT id
-                        FROM users
-                        WHERE users.created_by = ?
-                     ) 
-                    ",
-                    @currentUser["user_id"]
-                ]
-            )
-            render json: { artists: allArtists }, status: :ok            
+            allArtists = Artist.joins(:user)
+            .where("users.role = '2'")
+            .where("users.created_by IN (SELECT id FROM users WHERE users.created_by = ?)", @currentUser["user_id"])
+            .select("artists.*, #{(User.column_names - ["password_digest"]).map{ |col| "users.#{col}" }.join(", ")}")
+
+            if params[:query].present?
+                allArtists = allArtists.where("users.firstname LIKE ? OR users.lastname LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+            end
+
+            totalCount = allArtists.length
+            allArtists = allArtists.limit(limit).offset(offset)
+
+            render json: { message: "All artists retrieved successfully", data: allArtists, total: totalCount }, status: :ok            
         end
-    end
-
-    def show
-        if @currentUser["role"] == "artist"
-            artist = Artist.joins(:user).where(user_id: @currentUser["user_id"]).first
-            render json: artist , status: :ok
-        elsif  @currentUser["role"] == "artist_manager"
-            artist = Artist.find_by_sql(
-                [
-                    "SELECT artists.*, users.*
-                     FROM artists
-                     INNER JOIN users ON artists.user_id = users.id
-                     WHERE users.created_by = ? AND users.id = ?
-                    ",
-                    [@currentUser["user_id"], params[:id]]
-                ], 
-            )
-
-            unless artist
-                render json: { message: "can not get artist with that id" }, status: :unprocessable_entity
-                return 
-            end
-            render json: artist, status: :ok
-        else 
-            artist = Artist.find_by_sql(
-                [
-                    "SELECT artists.*, users.*
-                     FROM artists
-                     INNER JOIN users ON artists.user_id = users.id
-                     WHERE users.id = ? AND user.id IN (
-                        SELECT id
-                        FROM users
-                        WHERE users.created_by = ?
-                     )
-                    ",
-                    [params[:id], @currentUser["user_id"]]
-                ], 
-            )
-
-            unless artist
-                render json: { message: "can not get artist with that id" }, status: :unprocessable_entity
-                return 
-            end
-            render json: artist, status: :ok
-        end 
     end
 
     def update

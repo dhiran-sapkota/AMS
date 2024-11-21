@@ -22,20 +22,40 @@ class UsersController < ApplicationController
     end
 
 
-    def getAllUser     
+    def index     
         if @currentUser["role"] != "super_admin"
             render json: {message: "permission denied"}, status: :forbidden
             return
         end
+        limit = params.fetch(:limit, 5)
+        offset = params.fetch(:offset, 0)
         begin
-            user = User.where("created_by = ?", @currentUser["user_id"]).where("role = 1")
-            render json: { users: user }, status: :ok
+            users = User.where("created_by = ?", @currentUser["user_id"]).where("role = 1").select("#{(User.column_names - ["password_digest"]).join(", ")}")
+
+            if params[:query].present?
+                users = users.where("firstname LIKE ? OR lastname LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+            end
+        
+              if params[:sort_by].present?
+                allowed_sort_columns = ['created_at', 'firstname', 'lastname', "email", "phone", "address"] 
+                sort_column = allowed_sort_columns.include?(params[:sort_by]) ? params[:sort_by] : 'created_at'
+                sort_order = params[:sort_order] == 'desc' ? 'desc' : 'asc' 
+                users = users.order("#{sort_column} #{sort_order}")
+              else
+                users = users.order(created_at: :desc)
+              end
+              
+              totalCount = users.length
+        
+              users = users.limit(limit).offset(offset)
+            
+            render json: { message: "Users retrieved successfully", data: users, total: totalCount }, status: :ok
         rescue => e
             render json: { message: e }
         end 
     end
 
-    def updateUser
+    def update
         user = User.find_by(id: params[:id])
         if !user 
             render json: {message: "User does not exist with that id"}, status: :not_found
@@ -59,7 +79,7 @@ class UsersController < ApplicationController
         end
     end
 
-    def deleteUser
+    def destroy
         begin
             user = User.find_by(id: params[:id])
             if !user 
