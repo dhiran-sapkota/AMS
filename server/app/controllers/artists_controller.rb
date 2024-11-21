@@ -114,11 +114,7 @@ class ArtistsController < ApplicationController
 
         allparams = artist_params
         allparams.delete(:password) if allparams.key?(:password)
-
-
-
         
-
     end
 
     def destroy
@@ -127,7 +123,6 @@ class ArtistsController < ApplicationController
             return
         end
 
-        puts params[:id]
         artist = Artist.find_by_sql(
                 "SELECT artists.*, users.*
                  FROM artists
@@ -135,17 +130,15 @@ class ArtistsController < ApplicationController
                  WHERE users.created_by = ? AND users.id = ?",
  
             [@currentUser["user_id"], params[:id]]
+        ).first
 
-        )  
-
-        unless artist&.any?
+        unless artist
             render json: { message: "Cannot delete artist" }, status: :unprocessable_entity
             return
           end
           
-        
         unless artist.destroy
-            render json: { message: "artist deletion failed", errors: artist.errors.full_messages }, status: :ok
+            render json: { message: "artist deletion failed", errors: artist.errors.full_messages }, status: :unprocessable_entity
             return
         end
         render json: { message: "artist deleted successfully" }, status: :ok
