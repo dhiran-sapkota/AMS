@@ -3,6 +3,7 @@ class User < ApplicationRecord
     belongs_to :creator, class_name: "User", optional:true, foreign_key: "created_by"
     has_many :created_users, class_name: "User", foreign_key: "created_by"
     has_one :artist
+    has_many :musics
 
     enum gender: { m: 0, f: 1, o: 2 }
     enum role: { super_admin: 0, artist_manager: 1, artist: 2 }
