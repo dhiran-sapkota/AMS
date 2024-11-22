@@ -22,7 +22,7 @@ const ArtistRow = ({ artist, index, offset }: props) => {
           {offset + (++index)}
         </NavLink>
       </TableCell>
-      <TableCell>{artist.first_name} {artist.last_name}</TableCell>
+      <TableCell>{artist.firstname} {artist.lastname}</TableCell>
       <TableCell>{artist.email}</TableCell>
 
       <TableCell>{dayjs(artist.dob).format(DATE_FORMAT)}</TableCell>

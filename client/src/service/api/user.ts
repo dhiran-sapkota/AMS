@@ -18,9 +18,10 @@ export const fetchUsers = async ({ limit = 10, offset }: Pagination) => {
 
 export const createUser = async (body: TUserPayload) => {
   const { data } = await axiosInstance.post<Response<TUser>>(
-    "/user/create",
-    body
+    "/users",
+    {user: body}
   );
+  console.log(data)
   if (data?.success) {
     toast({
       variant: "default",
@@ -38,9 +39,10 @@ export const createUser = async (body: TUserPayload) => {
 
 export const updateUser = async (body: Partial<TUserPayload>, id: number) => {
     const { data } = await axiosInstance.patch<Response<TUser>>(
-      `/user/update/${id}`,
+      `/users/${id}`,
       body
     );
+    console.log(data, "updated data")
     if (data?.success) {
       toast({
         title: "Success",
@@ -57,7 +59,7 @@ export const updateUser = async (body: Partial<TUserPayload>, id: number) => {
 
 export const deleteUser = async (id: number) => {
     const { data } = await axiosInstance.delete<Response<TUser>>(
-      `/user/delete/${id}`
+      `/users/${id}`
     );
     if (data?.success) {
       toast({

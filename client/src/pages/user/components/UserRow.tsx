@@ -16,7 +16,7 @@ const UserRow = ({ user, index, offset }: props) => {
     <TableRow>
       <TableCell>{offset + (++index)}</TableCell>
       <TableCell>
-        {user.first_name} {user.last_name}
+        {user.firstname} {user.lastname}
       </TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>{user.phone}</TableCell>

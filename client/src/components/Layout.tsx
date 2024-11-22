@@ -77,7 +77,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
                 <span className="mr-4 text-sm text-gray-600 dark:text-primary hidden sm:inline">
-                  Welcome, {user?.first_name || 'User'}
+                  Welcome, {user?.firstname || 'User'}
                 </span>
               </div>
               <h1 className="text-lg font-semibold text-gray-900 dark:text-primary">Artist Management System</h1>

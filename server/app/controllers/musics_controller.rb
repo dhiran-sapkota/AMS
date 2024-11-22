@@ -15,13 +15,13 @@ class MusicsController < ApplicationController
       limit = params.fetch(:limit, 5)
       offset = params.fetch(:offset, 0)
       
-      musics = Music.where(user_id: artistId)
+      musics = Music.joins(:user).where(user_id: artistId).select("musics.*, users.firstname || ' ' || users.lastname as artist_name")
       if params[:query].present?
-        musics = musics.where("title LIKE ?", "%#{params[:query]}%")
+        musics = musics.where("title LIKE ? OR album_name LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
       end
 
       if params[:sort_by].present?
-        allowed_sort_columns = ['created_at', 'title', 'updated_at'] 
+        allowed_sort_columns = ['created_at', 'title', 'updated_at', 'album_name'] 
         sort_column = allowed_sort_columns.include?(params[:sort_by]) ? params[:sort_by] : 'created_at'
         sort_order = params[:sort_order] == 'desc' ? 'desc' : 'asc' 
         musics = musics.order("#{sort_column} #{sort_order}")

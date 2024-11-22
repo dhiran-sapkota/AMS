@@ -18,8 +18,7 @@ export default function UserListingPage() {
   } = useQuery({ queryKey: [QUERY_KEYS.ARTIST, offset], queryFn: () => fetchArtists({ limit: LIMIT, offset: offset }) });
 
   const { user } = useAuth();
-  console.log(artists)
-
+  
   if (error) return <div>An error has occurred</div>;
 
   const tableHeaders = ["S.No", "Name", "Email", "Date of birth", "Gender", "Address", "First Release Year", "Number of Albums Released", "Actions"];

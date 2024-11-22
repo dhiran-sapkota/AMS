@@ -24,8 +24,8 @@ export type TUserRegister = {
 }
 
 export type TUserPayload = {
-    first_name: string;
-    last_name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     password: string;
     phone: string;
@@ -63,8 +63,8 @@ export type LoginResponse = {
 }
 
 export type TArtistPayload = {
-    first_name: string
-    last_name: string
+    firstname: string
+    lastname: string
     dob: string
     gender: "m" | "f" | "o"
     address: string

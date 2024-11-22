@@ -7,6 +7,7 @@ import {
 } from "@/types";
 import axiosInstance from "../axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
 
 export const fetchArtists = async ({ limit, offset }: Pagination) => {
   const  data  = await axiosInstance.get<ListResponse<TArtist>>(
@@ -17,8 +18,8 @@ export const fetchArtists = async ({ limit, offset }: Pagination) => {
 
 export const createArtist = async (body: TArtistPayload) => {
     const { data } = await axiosInstance.post<Response<TArtist>>(
-      "/artist/create",
-      body
+      "/artists",
+      {artist:  body}
     );
     if (data?.success) {
       toast({
@@ -39,8 +40,8 @@ export const updateArtist = async (
   id: number
 ) => {
   const { data } = await axiosInstance.patch<Response<TArtist>>(
-    `/artist/update/${id}`,
-    body
+    `/artists/${id}`,
+    { artist: body }
   );
   if (data?.success) {
     toast({
@@ -57,19 +58,24 @@ export const updateArtist = async (
 };
 
 export const deleteArtist = async (id: number) => {
+  try{
   const { data } = await axiosInstance.delete<Response<TArtist>>(
-    `/artist/delete/${id}`
+    `/artists/${id}`
   );
   if (data?.success) {
     toast({
       title: "Success",
       description: data?.message ?? "Artist deleted Successfully",
     });
+    console.log(data)
+  
     return data;
-  } else {
-    toast({
-      title: "Success",
-      description: data?.message ?? "Unable to delete artist",
-    });
   }
+}catch(err : any){
+  toast({
+    variant: "destructive",
+    title: "Failure",
+    description: err?.response?.data?.message ?? "Unable to delete artist",
+  });
+}
 };

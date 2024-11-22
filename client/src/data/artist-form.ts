@@ -5,12 +5,12 @@ import * as z from "zod";
 export const artistFormDetails: FieldDetails[] = [
   {
     label: "First Name",
-    name: "first_name",
+    name: "firstname",
     type: "text",
   },
   {
     label: "Last Name",
-    name: "last_name",
+    name: "lastname",
     type: "text",
   },
   {
@@ -70,8 +70,8 @@ export const artistFormDetails: FieldDetails[] = [
 ];
 
 export const artistFormSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
+  firstname: z.string().min(1, "First name is required"),
+  lastname: z.string().min(1, "Last name is required"),
   email: z
     .string()
     .min(1, "Email is required")

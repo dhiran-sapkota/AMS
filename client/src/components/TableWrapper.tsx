@@ -5,7 +5,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from './ui/table'
 type props = {
     children: React.ReactNode
     isLoading: boolean
-    headers: string[]
+    headers: (string | React.ReactNode)[]
     length: number
 }
 

@@ -10,8 +10,8 @@ export type FieldDetails = {
 };
 
 export const userUpdateSchema = z.object({
-  first_name: z.string({message : "First name is required"}).min(1, "First name is required"),
-  last_name: z.string({message : "Last name is required"}).min(1, "Last name is required"),
+  firstname: z.string({message : "First name is required"}).min(1, "First name is required"),
+  lastname: z.string({message : "Last name is required"}).min(1, "Last name is required"),
   email: z
     .string({message : "Email is required"})
     .min(1, "Email is required")
@@ -33,12 +33,12 @@ export const userFormSchema = userUpdateSchema.extend({
 export const userFormDetails: FieldDetails[] = [
   {
     label: "First Name",
-    name: "first_name",
+    name: "firstname",
     type: "text",
   },
   {
     label: "Last Name",
-    name: "last_name",
+    name: "lastname",
     type: "text",
   },
   {
