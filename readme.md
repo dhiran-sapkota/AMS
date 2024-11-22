@@ -1,1 +1,1 @@
-## Artist Management System using ruby on rails and nextjs
+## Artist Management System using ruby on rails and reactjs
