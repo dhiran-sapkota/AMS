@@ -1,3 +1,5 @@
+require "csv"
+
 class MusicsController < ApplicationController
     include AuthenticationConcern
   
@@ -68,6 +70,28 @@ class MusicsController < ApplicationController
       else
         render json: { message: "Cannot find music with that ID" }, status: :not_found
       end
+    end
+
+    def bulkdownload
+      artistId = params[:id]
+      if artistId.blank?
+        render json: { message: "Artist ID is required" }, status: :bad_request
+        return
+      end
+
+      musics = Music.joins(:user).where(user_id: artistId).select("musics.*, users.firstname || ' ' || users.lastname as artist_name")
+
+      csv_data = CSV.generate(headers: true) do |csv|
+        csv << ["Title", "Album Name", "Genre", "Artist"]
+        musics.each do |music|
+          csv << [music.title, music.album_name, music.genre, music.artist_name]
+        end
+      end
+
+      send_data csv_data, filename: "musics_#{Time.now.to_i}.csv", type: "text/csv"
+    end
+
+    def bulkupload
     end
   
     private

@@ -22,5 +22,10 @@ Rails.application.routes.draw do
     resources :users
     resources :artists
     resources :musics
+
+    scope "/bulk" do
+      get "/music", to:"musics#bulkdownload"
+      post "/music", to:"musics#bulkupload"
+    end
   end
 end

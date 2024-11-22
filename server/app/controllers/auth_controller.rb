@@ -26,20 +26,17 @@ class AuthController < ApplicationController
     end
 
     def tokenvalidate
-      puts "was here-------------------------------------------"
       token = request.headers["Authorization"]&.split(" ")&.last
-      puts token
-      puts "---------"
-        if token
+      if token
             user = decode_token(token)
             unless user
                 render json: { message: "invalid token"}, status: :unauthorized
                 return
             end    
             render json: {message: "token is valid", user: user}
-        else
+      else
             render json: { message: "token missing"}, status: :unauthorized
-        end
+      end
     end
 
     private
