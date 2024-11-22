@@ -34,7 +34,10 @@ export const registerUser = async (body: TUserRegister) => {
   const { data } = await axiosInstance.post<Response<TUser>>(
     "/auth/register",
     {
-      user : body
+      user : {
+        ...body,
+        role : "super_admin"
+      },
     }
   );
   if (data?.success) {

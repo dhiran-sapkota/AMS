@@ -7,25 +7,67 @@ import { LIMIT, QUERY_KEYS } from "@/data/constant";
 import CustomPagination from "@/components/Pagination";
 import { useState } from "react";
 import TableWrapper from "@/components/TableWrapper";
+import Search from "@/components/Search";
+import { usePrepareHeaders } from "@/hooks/use-prepare-headers";
+
+const headerDetails = [
+  {
+    title: "S.No."
+  },
+  {
+    title: "Name",
+    value: "firstname"
+  },
+  {
+    title: "Email",
+    value: "email"
+  },
+  {
+    title: "Phone",
+    value: "phone"
+  },
+  {
+    title: "Date of Birth"
+  },
+  {
+    title: "Gender"
+  },
+  {
+    title: "Address",
+    value: "address"
+  },
+  {
+    title: "Role"
+  },
+  {
+    title: "Actions"
+  }
+]
 
 export default function UserListingPage() {
   const [offset, setOffset] = useState(0);
+  const [search, setSearch] = useState("");
+  const {headers, sortingInfo} = usePrepareHeaders(headerDetails)
   const {
     data: users,
     isLoading,
     error,
   } = useQuery({
-    queryKey: [QUERY_KEYS.USER, offset],
-    queryFn: () => fetchUsers({ limit: LIMIT, offset: offset }),
+    queryKey: [QUERY_KEYS.USER, offset, search, sortingInfo],
+    queryFn: () => fetchUsers({
+      limit: LIMIT, offset: offset, query: search, sortingInfo
+    }),
   });
 
-  const headers = ["S.No", "Name", "Email", "Phone", "Date of Birth", "Gender", "Address", "Role", "Actions"];
   if (error) return <div>An error has occurred</div>;
 
   return (
     <Card className="h-full flex flex-col ">
       <CardHeader className=" flex flex-row items-center justify-between">
-        <CardTitle>Users</CardTitle>
+        <div className=" flex items-center gap-4">
+          <CardTitle>Users</CardTitle>
+          <Search setSearch={setSearch} />
+        </div>
         <div>
           <AddUser />
         </div>

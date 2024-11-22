@@ -20,4 +20,4 @@ roleMap.set("artist_manager", "Artist Manager")
 roleMap.set("artist", "Artist")
 roleMap.set("super_admin", "Super Admin")
 
-export const LIMIT = 10
+export const LIMIT = 3

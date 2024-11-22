@@ -13,8 +13,8 @@ export type Response<T> = {
 }
 
 export type TUserRegister = {
-    first_name: string;
-    last_name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     password: string;
     phone: string;
@@ -110,6 +110,11 @@ export type ListResponse<T> = {
 export type Pagination = {
     offset: number
     limit: number
+    query?:string
+    sortingInfo ?: {
+        order : "desc" | "asc" | null
+        order_by : string | null
+    } 
 }
 
 export type CustomError = {

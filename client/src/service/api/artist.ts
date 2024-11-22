@@ -7,12 +7,11 @@ import {
 } from "@/types";
 import axiosInstance from "../axiosInstance";
 import { toast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
 
-export const fetchArtists = async ({ limit, offset }: Pagination) => {
-  const  data  = await axiosInstance.get<ListResponse<TArtist>>(
-    `/artists?limit=${limit}&offset=${offset}`
-  );
+export const fetchArtists = async ({ limit, offset, query="", sortingInfo }: Pagination) => {
+  let queryString = `/artists?limit=${limit}&offset=${offset}&query=${query}`
+  if(sortingInfo?.order && sortingInfo.order_by) queryString += `&sort_by=${sortingInfo.order_by}&sort_order=${sortingInfo.order}`  
+  const  data  = await axiosInstance.get<ListResponse<TArtist>>(queryString);
   return data;
 };
 

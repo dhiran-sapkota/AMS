@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -9,13 +9,12 @@ import { routes } from '@/data/routes'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout, isLoading } = useAuth()
-  const navigate = useNavigate()
   const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const userRole = user?.role ?? 'artist'
   const handleLogout = () => {
     logout()
-    navigate('/login')
+    window.location.href = "/login"
   }
 
   const NavLinks = () => (

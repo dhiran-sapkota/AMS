@@ -7,7 +7,6 @@ class ArtistsController < ApplicationController
 
 
     def index
-
         limit = params.fetch(:limit, 5)
         offset = params.fetch(:offset, 0)
 
@@ -15,10 +14,19 @@ class ArtistsController < ApplicationController
             allArtists = Artist.joins(:user)
             .where("users.role = '2'")
             .where("users.created_by = ?", @currentUser["user_id"])
-            .select("artists.*, #{(User.column_names - ["password_digest"]).map{ |col| "users.#{col}" }.join(", ")}")
+            .select("artists.*, #{(User.column_names - ["password_digest", "id"]).map{ |col| "users.#{col}" }.join(", ")}")
             
             if params[:query].present?
                 allArtists = allArtists.where("users.firstname LIKE ? OR users.lastname LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+            end
+
+            if params[:sort_by].present?
+                allowed_sort_columns = ['firstname', "email", "address", "first_release_year"] 
+                sort_column = allowed_sort_columns.include?(params[:sort_by]) ? params[:sort_by] : 'created_at'
+                sort_order = params[:sort_order] == 'desc' ? 'desc' : 'asc' 
+                allArtists = allArtists.order("#{sort_column} #{sort_order}")
+            else
+                allArtists = allArtists.order(created_at: :desc)
             end
 
             totalCount = allArtists.length
@@ -29,10 +37,25 @@ class ArtistsController < ApplicationController
             allArtists = Artist.joins(:user)
             .where("users.role = '2'")
             .where("users.created_by IN (SELECT id FROM users WHERE users.created_by = ?)", @currentUser["user_id"])
-            .select("artists.*, #{(User.column_names - ["password_digest"]).map{ |col| "users.#{col}" }.join(", ")}")
+            .select("artists.*, #{(User.column_names - ["password_digest"]).map{ |col| "users.#{col}" }.join(", ")}, CASE users.gender 
+             WHEN 0 THEN 'm'
+             WHEN 1 THEN 'f'
+             WHEN 2 THEN 'o'
+             ELSE 'Unknown' 
+             END AS gender")
 
             if params[:query].present?
                 allArtists = allArtists.where("users.firstname LIKE ? OR users.lastname LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
+            end
+
+            if params[:sort_by].present?
+                allowed_sort_columns = ['firstname', "email", "address", "first_release_year"] 
+                sort_column = allowed_sort_columns.include?(params[:sort_by]) ? params[:sort_by] : 'created_at'
+                sort_order = params[:sort_order] == 'desc' ? 'desc' : 'asc' 
+
+                allArtists = allArtists.order("#{sort_column} #{sort_order}")
+            else
+                allArtists = allArtists.order(created_at: :desc)
             end
 
             totalCount = allArtists.length

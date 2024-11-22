@@ -8,20 +8,18 @@ import {
 import axiosInstance from "../axiosInstance";
 import { toast } from "@/hooks/use-toast";
 
-export const fetchUsers = async ({ limit = 10, offset }: Pagination) => {
-  const data = await axiosInstance.get<ListResponse<TUser>>(
-    `/users?limit=${limit}&offset=${offset}`
-  );
-  console.log(data, "data")
+export const fetchUsers = async ({ limit = 10, offset, query="", sortingInfo }: Pagination) => {
+  let usersString = `/users?limit=${limit}&offset=${offset}&query=${query}` 
+  if(sortingInfo?.order && sortingInfo?.order_by) usersString += `&sort_by=${sortingInfo.order_by}&sort_order=${sortingInfo.order}` 
+  const data = await axiosInstance.get<ListResponse<TUser>>(usersString);
   return data;
 };
 
 export const createUser = async (body: TUserPayload) => {
   const { data } = await axiosInstance.post<Response<TUser>>(
     "/users",
-    {user: body}
+    { user: body }
   );
-  console.log(data)
   if (data?.success) {
     toast({
       variant: "default",
@@ -42,7 +40,6 @@ export const updateUser = async (body: Partial<TUserPayload>, id: number) => {
       `/users/${id}`,
       body
     );
-    console.log(data, "updated data")
     if (data?.success) {
       toast({
         title: "Success",
