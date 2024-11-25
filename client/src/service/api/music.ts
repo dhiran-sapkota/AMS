@@ -25,7 +25,8 @@ export const fetchMusic = async ({
     let requestStr = `/musics?id=${artist_id}&limit=${limit}&offset=${offset}&query=${
       query ?? ""
     }`;
-    if (sort_by && sort_order) requestStr += (`&sort_by=${sort_by}&sort_order=${sort_order}`)
+    if (sort_by && sort_order)
+      requestStr += `&sort_by=${sort_by}&sort_order=${sort_order}`;
     const data = await axiosInstance.get<ListResponse<TMusic>>(requestStr);
     return data;
   }
@@ -102,3 +103,17 @@ export const bulkUploadMusic = async (body: TMusicPayload[]) => {
     });
   }
 };
+
+export const bulkDownloadMusic = async (artist_id: number) => {
+  if (artist_id) {
+    const data = await axiosInstance.get<TMusic[]>(
+      `/bulk/music?id=${artist_id}`
+    );
+    return data;
+  }
+};
+
+export const bulkMusicUpload = async (data: FormData) => {
+    const musicData = await axiosInstance.post(`/bulk/music`, data)
+    return musicData
+}

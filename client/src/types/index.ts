@@ -121,4 +121,5 @@ export type CustomError = {
     message: string
     status: number
     success: any
+    errors?:string[]
 }

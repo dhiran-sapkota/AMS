@@ -3,7 +3,7 @@ require "csv"
 class MusicsController < ApplicationController
     include AuthenticationConcern
   
-    before_action :check_artist_permission, only: [:create, :update, :destroy]
+    before_action :check_artist_permission, only: [:create, :update, :destroy, :bulkupload]
     before_action :set_music, only: [:update, :destroy]
 
   
@@ -92,6 +92,50 @@ class MusicsController < ApplicationController
     end
 
     def bulkupload
+      if params[:file].present?
+        file = params[:file]
+        result = process_csv(file)
+        if result[:errors].any?
+          render json: { message: "Upload failed with some errors", errors: result[:errors]}, status: :unprocessable_entity
+        else
+          render json: { message: "All records uploaded successfully", data: result[:created_record]}, status: :ok
+        end
+      end
+    end
+
+    private
+    def process_csv(file)
+      created_record = []
+      errors = []
+
+      # check if header's provided is valid or not
+      headers = CSV.read(file.path, headers: true).headers
+      musicKeyMapping = {
+        "Title" => "title",
+        "Album Name" => "album_name",
+        "Genre" => "genre"
+      }
+      missingColms = ["Title", "Album Name", "Genre"] - headers
+      if missingColms.any?
+        return { errors: ["columns missing: #{missingColms.join(", ")}"] }
+      end
+
+      CSV.foreach(file.path, headers: true) do |row|
+        music_data = row.to_hash.each_with_object({}) do |(key, value), new_hash|
+          new_key = musicKeyMapping[key]
+          if ["Title", "Album Name", "Genre"].include?(key)
+            new_hash[new_key] = value
+          end
+        end
+        music_data["user_id"] = @currentUser["user_id"]
+        music = Music.new(music_data)
+        if music.save
+          created_record << music
+        else
+          errors << {row: row.to_hash, errors: user.errors.full_messages}
+        end
+      end
+      {created_record: created_record, errors: errors}
     end
   
     private

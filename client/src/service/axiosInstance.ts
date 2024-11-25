@@ -7,7 +7,6 @@ const axiosInstance = axios.create({
   baseURL: `${baseURL}/api`,
   timeout: 20000,
   headers: {
-    "Content-Type": "application/json",
     "Authorization": `Bearer ${Cookies.get("Authorization")}`,
   },
 });

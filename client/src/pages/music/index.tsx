@@ -1,6 +1,6 @@
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { bulkUploadMusic, fetchMusic } from "@/service/api/music";
+import { bulkDownloadMusic, bulkMusicUpload, fetchMusic } from "@/service/api/music";
 import AddMusic from "./components/AddMusic";
 import MusicRow from "./components/MusicRow";
 import { LIMIT, QUERY_KEYS } from "@/data/constant";
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { ArrowDown, ArrowUp, CloudDownload, CloudUpload } from "lucide-react";
-import { TMusicPayload } from "@/types";
+import { AxiosResponse, CustomError } from "@/types";
 import { Label } from "@/components/ui/label";
 import { queryClient } from "@/App";
 import Spinner from "@/components/Spinner";
@@ -65,9 +65,33 @@ export default function MusicListingPage() {
   const { data: allMusic, isLoading: isAllMusicLoading } = useQuery({
     queryKey: [QUERY_KEYS.MUSIC, offset, artistId],
     queryFn: () =>
-      fetchMusic({ limit: LIMIT, offset: offset, artist_id: Number(artistId) }),
+      bulkDownloadMusic( Number(artistId) ),
     enabled: !!artistId,
   });
+
+  const { mutate: uploadBulk, isLoading: isMusicUploading } = useMutation(bulkMusicUpload, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.MUSIC] });
+    },
+    onError: (error: AxiosResponse<CustomError>) => {
+      if(error?.response?.data?.errors && error?.response?.data?.errors?.length>0){
+        error?.response?.data?.errors.forEach((error)=>(
+          toast({
+            variant: "destructive",
+            title: "Upload failed",
+            description: error ?? "Unable to upload in bulk",
+          })
+        ))
+      }else{
+        toast({
+          variant: "destructive",
+          title: "Upload failed",
+          description: error?.response?.data?.message ?? "Unable to upload in bulk",
+        });
+      }
+    }
+  });
+
 
   const [file, setFile] = useState<File | null>(null);
 
@@ -78,13 +102,8 @@ export default function MusicListingPage() {
   };
 
   const handleDownload = async () => {
-    let csv = "title,album_name,genre\n";
-
-    const musicData = allMusic?.data?.data as TMusicPayload[];
-    musicData.forEach((track) => {
-      csv += `${track.title},${track.album_name},${track.genre}\n`;
-    });
-    const csvBlob = new Blob([csv], { type: "text/csv" });
+    const musicData = allMusic?.data.toString() ?? "";
+    const csvBlob = new Blob([musicData], { type: "text/csv" });
     const url = window.URL.createObjectURL(csvBlob);
     const a = document.createElement("a");
     a.href = url;
@@ -93,81 +112,13 @@ export default function MusicListingPage() {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleUpload = () => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const text = e.target?.result as string;
-        const rows = text.split("\n").map((row) => row.split(","));
-
-        const headers = rows[0].map((header) => header.trim().toLowerCase());
-        const titleIndex = headers.indexOf("title");
-        const albumIndex = headers.indexOf("album_name");
-        const genreIndex = headers.indexOf("genre");
-
-        if (titleIndex === -1 || albumIndex === -1 || genreIndex === -1) {
-          toast({
-            title: "Error",
-            description:
-              "CSV must contain 'title', 'album_name', and 'genre' columns.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const newData = rows
-          .slice(1)
-          .map((row) => {
-            const title = row[titleIndex]?.trim();
-            const album_name = row[albumIndex]?.trim();
-            const genre = row[genreIndex]?.trim();
-
-            if (!title || !album_name || !genre) {
-              return null;
-            }
-
-            return {
-              title,
-              album_name,
-              genre,
-              artist_id: artistId,
-            };
-          })
-          .filter(Boolean);
-
-        if (newData.length === 0) {
-          toast({
-            title: "Error",
-            description: "No valid data found in the CSV.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        try {
-          const response = await bulkUploadMusic(newData as any);
-          toast({
-            title: "Success",
-            description: "Music data uploaded successfully.",
-          });
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MUSIC });
-          setFile(null);
-        } catch (error) {
-          console.error(error);
-          toast({
-            title: "Error",
-            description: "Failed to upload music data.",
-            variant: "destructive",
-          });
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
+  const handleUpload = async () => {
+    const formdata = new FormData()
+    formdata.append("file", file as File)
+    uploadBulk(formdata)
+  }  
 
   if (error) return <div>An error has occurred</div>;
-
-
 
   const headers = [
     "S.No",
@@ -231,14 +182,12 @@ export default function MusicListingPage() {
             <Search setSearch={setSearch} />
           </div>
         </div>
-        {user?.role === "artist" && (
           <div className="flex gap-2">
             <Button variant={"outline"} onClick={handleDownload}>
               {isAllMusicLoading ? <Spinner /> : <CloudDownload />}
             </Button>
             <div className="flex items-center space-x-2">
               <Button
-                onClick={() => console.log("button clicked")}
                 variant={"outline"}
               >
                 <Label htmlFor="file">
@@ -253,12 +202,12 @@ export default function MusicListingPage() {
                 />
               </Button>
               <Button onClick={handleUpload} disabled={!file}>
-                Upload CSV
+                {isMusicUploading ? <Spinner /> : "Upload CSV"}
               </Button>
             </div>
-            <AddMusic header="Add Music" title="Add Music" />
+            { user?.role ==="artist" && <AddMusic header="Add Music" title="Add Music" /> }
           </div>
-        )}
+        {/* )} */}
       </CardHeader>
       <CardContent className=" flex-1">
         <TableWrapper
