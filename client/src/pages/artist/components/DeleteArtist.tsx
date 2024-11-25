@@ -21,7 +21,7 @@ const DeleteArtist = ({ artist }: { artist: TArtist }) => {
     <Modal
       closeModal={() => setOpen((prev) => !prev)}
       header="Delete"
-      title={`Delete ${artist.first_name}?`}
+      title={`Delete ${artist.firstname}?`}
       open={open}
     >
       <div>Are you sure you want to delete this artist?</div>

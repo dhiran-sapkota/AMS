@@ -66,6 +66,7 @@ const AddArtist = ({ artist, title, header }: props) => {
 
   return (
     <Modal
+      className="sm:max-w-[750px]"
       closeModal={() => setOpenModal((prev) => !prev)}
       open={openModal}
       header={header}
@@ -73,7 +74,7 @@ const AddArtist = ({ artist, title, header }: props) => {
     >
       <Form {...form}>
         <form
-        className="flex flex-col gap-2 overflow-auto max-h-[80vh]"
+          className="flex flex-col gap-2 overflow-auto max-h-[80vh]"
           onSubmit={form.handleSubmit((data) => {
             if (artist) {
               mutateUpdateArtist({
@@ -94,13 +95,15 @@ const AddArtist = ({ artist, title, header }: props) => {
             }
           })}
         >
-          {artistFormDetails.filter(formitem => !artist ? true : formitem.name !== "password").map((field) => (
-            <CustomInput
-              control={form.control}
-              key={field.name}
-              fielddata={field}
-            />
-          ))}
+          <div className=" grid grid-cols-2 gap-4">
+            {artistFormDetails.filter(formitem => !artist ? true : formitem.name !== "password").map((field) => (
+              <CustomInput
+                control={form.control}
+                key={field.name}
+                fielddata={field}
+              />
+            ))}
+          </div>
           <DialogFooter className=" mt-4 sticky bottom-0 bg-background">
             <Button disabled={isLoading || isUpdateLoading} type="submit">
               {(isLoading || isUpdateLoading) && <Spinner />} Save

@@ -6,6 +6,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { cx } from "class-variance-authority";
+import React from "react";
 
 type props = {
   title: string;
@@ -16,13 +18,13 @@ type props = {
   isLoading?: boolean;
 };
 
-export function Modal({ children, header, title, open, closeModal }: props) {
+export const Modal: React.FC<props & React.HTMLAttributes<HTMLDivElement>> = ({ children, header, title, open, closeModal, ...props }) => {
   return (
     <Dialog open={open} onOpenChange={closeModal}>
       <DialogTrigger asChild>
         <Button variant="outline">{header}</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className={cx("sm:max-w-[425px]", props.className)}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
