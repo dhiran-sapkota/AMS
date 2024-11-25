@@ -148,7 +148,6 @@ class MusicsController < ApplicationController
   
     def set_music
       @music = Music.find_by(id: params[:id])
-
       if @music[:user_id] != @currentUser["user_id"]
         render json: { message: "not allowed to update music"}, status: :forbidden
         nil

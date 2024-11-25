@@ -12,12 +12,7 @@ Rails.application.routes.draw do
   post "/api/auth/register", to:"auth#register"
   post "/api/auth/login", to:"auth#login"
   get "/api/auth/validate-token", to:"auth#tokenvalidate"
-
-  # post "/api/user/create", to:"users#create"
-  # get "/api/user/all", to:"users#getAllUser"
-  # patch "/api/user/update/:id", to:"users#updateUser"
-  # delete "/api/user/delete/:id", to:"users#deleteUser"
-
+  
   scope "/api" do
     resources :users
     resources :artists
