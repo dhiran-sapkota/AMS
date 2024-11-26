@@ -10,7 +10,7 @@ class UsersController < ApplicationController
         @user.created_by = @currentUser["user_id"]
 
         if @user[:role] != "artist_manager"
-            render json: {message: "cannot create user with that role"}, status: :forbidden
+            render json: {message: "cannot create user with that role"}, status: :unauthorized
             return
         end
 
@@ -24,7 +24,7 @@ class UsersController < ApplicationController
 
     def index     
         if @currentUser["role"] != "super_admin"
-            render json: {message: "permission denied"}, status: :forbidden
+            render json: {message: "permission denied"}, status: :unauthorized
             return
         end
         limit = params.fetch(:limit, 5)
@@ -62,7 +62,7 @@ class UsersController < ApplicationController
             return
         end
         if user[:created_by] != @currentUser["user_id"]
-            render json: {message: "can not update user"}, status: :forbidden
+            render json: {message: "can not update user"}, status: :unauthorized
             return
         end 
         
@@ -87,7 +87,7 @@ class UsersController < ApplicationController
                 return
             end
             if user[:created_by] != @currentUser["user_id"]
-                render json: {message: "can not update user"}, status: :forbidden
+                render json: {message: "can not update user"}, status: :unauthorized
                 return
             end 
 
@@ -102,7 +102,7 @@ class UsersController < ApplicationController
     private
     def authorizeSuperAdmin
         if @currentUser["role"] != "super_admin"
-            render json: { message: "not allowed" }, status: :forbidden
+            render json: { message: "not allowed" }, status: :unauthorized
         end
     end
 

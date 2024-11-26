@@ -18,7 +18,7 @@ axiosInstance.interceptors.response.use(
   async function (error) {
     // TODO: need to implement refresh token logic
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 403 && !originalRequest._retry) {
       Cookies.remove("Authorization");
       localStorage.clear();
       location.href = "/login";

@@ -60,7 +60,7 @@ class MusicsController < ApplicationController
     def update
       if @music
         if @music[:user_id] != @currentUser["user_id"]
-          render json: { message: "not allowed to update music"}, status: :forbidden
+          render json: { message: "not allowed to update music"}, status: :unauthorized
         end        
         if @music.update(music_params)
           render json: { message: "Music updated successfully", music: @music }, status: :ok
@@ -142,14 +142,14 @@ class MusicsController < ApplicationController
   
     def check_artist_permission
       unless isAllowedAction(["artist"])
-        render json: { message: "Permission denied, only artists can perform this action" }, status: :forbidden
+        render json: { message: "Permission denied, only artists can perform this action" }, status: :unauthorized
       end
     end
   
     def set_music
       @music = Music.find_by(id: params[:id])
       if @music[:user_id] != @currentUser["user_id"]
-        render json: { message: "not allowed to update music"}, status: :forbidden
+        render json: { message: "not allowed to update music"}, status: :unauthorized
         nil
       end
     end

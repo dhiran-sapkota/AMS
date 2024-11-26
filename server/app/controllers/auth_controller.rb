@@ -43,7 +43,7 @@ class AuthController < ApplicationController
     def is_role_super_admin
         role = params[:user][:role]
         if role != "super_admin"
-          render json: { message: "Permission Denied" }, status: :forbidden 
+          render json: { message: "Permission Denied" }, status: :unauthorized 
           return
         end
       end
