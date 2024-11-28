@@ -17,7 +17,8 @@ class UsersController < ApplicationController
         if @user.save
           render json: {message: "User created successfully"}, status: :created
         else
-          render json: {message: "Unable to create user", errors: @user.errors.full_messages }, status: :unprocessable_entity
+            Rails.logger.debug "User creation failed: #{@user.errors.full_messages}"
+            render json: {message: "Unable to create user", errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
     end
 
@@ -69,7 +70,7 @@ class UsersController < ApplicationController
         begin
             user.update(user_params)
             if user.save
-                render json: {message: "User updated successfully"}
+                render json: {message: "User updated successfully"}, status: :ok
             else 
                 render json: {message: "Unable to update user", errors: user.errors.full_messages }, status: :unprocessable_entity
             end

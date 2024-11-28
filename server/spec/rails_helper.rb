@@ -1,3 +1,21 @@
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_filter '/spec/'
+end
+
+SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
+  SimpleCov::Formatter::HTMLFormatter
+])
+
+puts "SimpleCov started, coverage will be generated in the coverage/ directory."
+
+require 'factory_bot_rails'
+
+RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods
+end
+
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
