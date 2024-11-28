@@ -62,11 +62,11 @@ export default function MusicListingPage() {
     enabled: !!artistId,
   });
 
-  const { data: allMusic, isLoading: isAllMusicLoading } = useQuery({
+  const { data: allMusic, isLoading: isAllMusicLoading, refetch } = useQuery({
     queryKey: [QUERY_KEYS.MUSIC, offset, artistId],
     queryFn: () =>
       bulkDownloadMusic( Number(artistId) ),
-    enabled: !!artistId,
+    enabled: false,
   });
 
   const { mutate: uploadBulk, isLoading: isMusicUploading } = useMutation(bulkMusicUpload, {
@@ -102,14 +102,17 @@ export default function MusicListingPage() {
   };
 
   const handleDownload = async () => {
-    const musicData = allMusic?.data.toString() ?? "";
-    const csvBlob = new Blob([musicData], { type: "text/csv" });
-    const url = window.URL.createObjectURL(csvBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "music.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const response = await refetch()
+    if(response.data){
+      const musicData = response?.data?.data.toString() ?? "";
+      const csvBlob = new Blob([musicData], { type: "text/csv" });
+      const url = window.URL.createObjectURL(csvBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "music.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
   };
 
   const handleUpload = async () => {
