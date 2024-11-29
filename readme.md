@@ -73,9 +73,9 @@ src/
 
 ```
 
-## BACKEND
+## Backend
 Backend is built on ruby on rails.
 To setup backend:
 1. Go to ```server``` directory
-2. Install all the gem files using ```bundle install``` (make sure ruby and rails is install on your system.)
+2. Install all the gem files using ```bundle install``` (make sure ruby and rails is installed on your system.)
 3. Run the server using command ```rails server```
