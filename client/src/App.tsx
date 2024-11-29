@@ -26,7 +26,7 @@ function App() {
               <Route path="/music" element={<AuthorizeRoute><MusicListingPage /></AuthorizeRoute>} />
               <Route path="/artists" element={<AuthorizeRoute><ArtistListingPage /></AuthorizeRoute>} />
               <Route path="/artists/:id" element={<AuthorizeRoute><MusicListingPage /></AuthorizeRoute>} />
-
+              
               <Route path="/" element={<Homepage />} />
             </Route>
           </Routes>
