@@ -3,8 +3,7 @@ require "rails_helper"
 RSpec.describe UsersController, type: :controller do
   include JwtHelper
   let!(:fake_user) { create(:user) }
-  let (:valid_token) {encode_token(
-        {
+  let (:valid_token) {encode_token({
           user_id: :fake_user["id"],
           firstname: :fake_user["firstname"],
           lastname: :fake_user["lastname"],
@@ -14,8 +13,8 @@ RSpec.describe UsersController, type: :controller do
           gender: :fake_user["gender"],
           address: :fake_user["address"],
           role: "super_admin"
-        }
-  )}
+        })}
+        
   describe "unauthenticated users" do
     it "should deny access to unauthenticated users to perform actions" do
       Rails.logger.debug "Starting the POST #create test"

@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :music do
-    title {"first music"}
-    album_name {"album"}
-    genre { [0, 1, 2, 3].sample }
+    title { "Sample Song" }
+    album_name { "Sample Album" }
+    genre { "rock" }
     association :user
-  end 
+  end
 end
